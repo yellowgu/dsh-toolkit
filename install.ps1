@@ -22,7 +22,7 @@ function Die($msg)  { Bad $msg; exit 1 }
 # ---------- 横幅 ----------
 Say '================================================================'
 Say '  dsh-toolkit V1.0.0 —— DeepSeek dsh 安装/配置脚本（非官方教程）'
-Say '  源码可见：' + $RepoUrl + '  （dsh 为 DeepSeek 官方工具，本脚本仅为国内环境经验分享）'
+Say ('  源码可见：' + $RepoUrl + '  （dsh 为 DeepSeek 官方工具，本脚本仅为国内环境经验分享）')
 Say '================================================================'
 Tip '本脚本将按顺序执行：环境检测 → 装 Node(如需) → 解除执行策略 → 安装 dsh → allow-scripts 补跑 → API Key 引导 → settings.yaml 配置 → 收尾'
 Tip '每一步都会先打印说明再执行；已完成的步骤重跑时会自动跳过。'
@@ -78,7 +78,7 @@ if (-not $nodeOk) {
 # ---------- 3/7 解除执行策略 ----------
 Step '3/7 解除 PowerShell 执行策略拦截'
 Tip '症状为"npm : 无法加载文件 ...npm.ps1，因为在此系统上禁止运行脚本"。修复方法：当前用户范围设为 RemoteSigned（不需要管理员）。'
-Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force | Out-Null
 $pol = (Get-ExecutionPolicy -Scope CurrentUser).ToString()
 if ($pol -eq 'RemoteSigned') { Ok ('执行策略已设为 ' + $pol) } else { Warn ('当前策略：' + $pol + '（若后续仍报 npm.ps1 禁止运行，请重开终端再试）') }
 
@@ -185,5 +185,5 @@ Tip '  4. 升级提醒：升级前关闭所有 dsh 进程（否则 EBUSY）'
 Tip '  5. 已有 Claude Code 的用户：可安装本仓库 plugin 获得自动化故障修复'
 Tip '     /plugin marketplace add yellowgu/dsh-toolkit'
 Tip '     /plugin install dsh-toolkit@dsh-toolkit'
-Tip '  故障排查：' + $RepoUrl + ' 的 README 故障表；或提 issue。'
+Tip ('  故障排查：' + $RepoUrl + ' 的 README 故障表；或提 issue。')
 Say '================================================================'
