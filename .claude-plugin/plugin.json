@@ -1,0 +1,11 @@
+{
+  "name": "dsh-toolkit",
+  "version": "1.0.0",
+  "description": "DeepSeek dsh 安装/配置工具箱（非官方教程）：npmmirror 安装、allow-scripts 补跑、settings.yaml 极简配置、视觉模型。面向中文用户。",
+  "author": { "name": "yellowgu", "email": "yellowgu@163.com" },
+  "homepage": "https://gitee.com/yellowgu/dsh-toolkit",
+  "repository": "https://gitee.com/yellowgu/dsh-toolkit",
+  "license": "MIT",
+  "keywords": ["dsh", "deepseek", "install", "china", "npmmirror"],
+  "skills": ["./skills/dsh-install"]
+}
