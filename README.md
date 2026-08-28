@@ -1,7 +1,7 @@
-# dsh-toolkit — DeepSeek dsh 安装/配置工具箱
+# dsh-toolkit — DeepSeek Harness (dsh) 安装/配置工具箱
 
-> 面向国内 Windows 用户的一键安装与配置工具：npmmirror 镜像安装、allow-scripts 暗病修复、API Key 引导、settings.yaml 极简配置、视觉模型。
-> **非官方教程**；dsh（DeepSeek Harness）本身是 DeepSeek 官方发布的工具。
+> 面向国内 Windows 用户的一键安装与配置工具（dsh = DeepSeek Harness，DeepSeek 官方 Agent 工具）：npmmirror 镜像安装、allow-scripts 暗病修复、API Key 引导、settings.yaml 极简配置、视觉模型。
+> **非官方教程**；DeepSeek Harness (dsh) 本身是 DeepSeek 官方发布的工具。
 > **本文基于 dsh 0.1.1-rc.2 验证（2026-08-27）**。dsh 处于快速迭代期，出入以 `dsh --help` 为准。
 
 [![Gitee](https://img.shields.io/badge/Gitee-yellowgu%2Fdsh--toolkit-red)](https://gitee.com/yellowgu/dsh-toolkit)
@@ -12,7 +12,7 @@
 
 | 你的情况 | 用哪个 |
 |---|---|
-| 完全小白：没装过 Node / dsh | 下面"一条命令安装" |
+| 完全小白：没装过 Node / dsh（DeepSeek Harness） | 下面"一条命令安装" |
 | 已有 dsh，但配置报错 / 发图失败 / 模型不可用 | 一条命令安装（脚本自动检测+配置），或装 Plugin 让修复自动化 |
 | 只想看文档手动操作 | "手动安装步骤" + "常见故障表" |
 
