@@ -57,6 +57,64 @@ irm https://gitee.com/yellowgu/dsh-toolkit/raw/main/install.ps1 -OutFile install
 | `read-only` | 只读，禁止写入 | 每次操作询问 |
 | `danger-full-access` | 无限制 | **绝不询问** |
 
+## 预期输出示例（节选）
+
+> 2026-08-28 沙盒实测录制：脚本 V1.0.0 + dsh 0.1.1-rc.2，已装场景（步骤 4 跳过安装）。
+> 全新安装时步骤 4 会显示 npm 安装输出；`added` 包数、Node 版本随环境浮动，`[通过]` 标记是校验重点。
+
+```powershell
+================================================================
+  dsh-toolkit V1.0.0 —— DeepSeek dsh 安装/配置脚本（非官方教程）
+  源码可见：https://gitee.com/yellowgu/dsh-toolkit  （dsh 为 DeepSeek 官方工具，本脚本仅为国内环境经验分享）
+================================================================
+  [说明] 本脚本将按顺序执行：环境检测 → 装 Node(如需) → 解除执行策略 → 安装 dsh → allow-scripts 补跑 → API Key 引导 → settings.yaml 配置 → 收尾
+
+[步骤] 1/7 环境检测
+  [通过] Node.js 已安装：v26.7.0
+  [通过] dsh 已检测到：0.1.1-rc.2
+  [警告] 检测到 1 个 dsh 相关进程正在运行。若稍后需要重装/升级，会先提示关闭。
+
+[步骤] 2/7 安装 Node —— 已跳过（本机已有 Node ≥ 20）
+
+[步骤] 3/7 解除 PowerShell 执行策略拦截
+  [通过] 执行策略可用：RemoteSigned
+
+[步骤] 4/7 安装 dsh（npm 全局 + npmmirror 镜像）
+  [通过] 已检测到 dsh 命令，跳过安装。（升级请见 README：升级前关闭所有 dsh 进程）
+
+[步骤] 5/7 allow-scripts 补跑（修复 npm 拦截安装脚本的暗病）
+  [说明] npm 默认拦截部分包的安装脚本，不补跑会有暗病（node-pty 原生模块、spawn helper 缺失）。本步骤无条件补跑一次，幂等安全。
+  added 452 packages in 28s
+  [通过] allow-scripts 补跑完成。
+
+[步骤] 6/7 API Key 与 settings.yaml 配置
+  [通过] DEEPSEEK_API_KEY 已存在（用户级环境变量），跳过。
+
+!!! 安全警告（必读） !!!
+上面即将写入的 settings.yaml 使用 defaultPreset: danger-full-access：
+  - 该模式跳过全部权限确认，Agent 的每条命令都会直接执行，不做任何拦截；
+  - 仅建议在单机自用环境使用；在生产/多用户环境请改用普通模式（见下）；
+  - 使用风险由用户自担。
+
+  [通过] settings.yaml 已创建于 C:\Users\<用户>\.dsh\settings.yaml（UTF-8 无 BOM）
+
+[步骤] 7/7 收尾验证
+  [通过] 验证通过：dsh 0.1.1-rc.2
+
+================================================================
+  全部步骤完成。
+  [说明] 下一步：
+  [说明]   1. 关闭本窗口，重新打开 PowerShell（让环境变量与 PATH 生效）
+  [说明]   2. 运行 dsh web（首次运行自动初始化 web profile 并启动浏览器界面）
+  [说明]   3. 一次性任务：dsh --profile headless "任务描述"
+```
+
+对照说明：
+
+- 第 3 步通过时显示的策略名以终端实际为准（`RemoteSigned` / `Bypass` 都算通过）
+- 首次运行无 API Key 时，步骤 6 会先询问并引导输入（输入不回显，只写用户级环境变量）
+- `settings.yaml` 已存在时自动备份不覆盖（安全警告横幅每次都会完整显示）
+
 ## 已有 Claude Code？装 Plugin 让修复自动化
 
 在 Claude Code 会话里：
