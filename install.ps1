@@ -1,6 +1,7 @@
 ﻿# ============================================================
-#  dsh-toolkit / install.ps1  V1.0.0
+#  dsh-toolkit / install.ps1  V1.1.0
 #  DeepSeek dsh CLI 安装/配置一键脚本（Windows 11 + PowerShell 5.1）
+#  Windows 专用；macOS 请用 install.sh（双平台说明见 README）
 #  中国网络环境：npm 走 npmmirror 镜像，Node 走 npmmirror CDN
 #  源码仓库：https://gitee.com/yellowgu/dsh-toolkit
 #  非官方教程；dsh 本身是 DeepSeek 官方发布的工具。
@@ -21,7 +22,7 @@ function Die($msg)  { Bad $msg; exit 1 }
 
 # ---------- 横幅 ----------
 Say '================================================================'
-Say '  dsh-toolkit V1.0.0 —— DeepSeek dsh 安装/配置脚本（非官方教程）'
+Say '  dsh-toolkit V1.1.0 —— DeepSeek dsh 安装/配置脚本（非官方教程）'
 Say ('  源码可见：' + $RepoUrl + '  （dsh 为 DeepSeek 官方工具，本脚本仅为国内环境经验分享）')
 Say '================================================================'
 Tip '本脚本将按顺序执行：环境检测 → 装 Node(如需) → 解除执行策略 → 安装 dsh → allow-scripts 补跑 → API Key 引导 → settings.yaml 配置 → 收尾'
