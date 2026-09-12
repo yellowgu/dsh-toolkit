@@ -69,7 +69,7 @@ dsh --profile headless "任务描述"   # 一次性会话,打印最终答案后�
 
 文件:`~/.dsh/settings.yaml`(Windows `C:\Users\<用户>\.dsh\settings.yaml`,**UTF-8**;两平台路径相同)。
 
-0.1.1-rc.2+ 官方适配器(llm-deepseek)**内置视觉支持**,默认模型目录自带 `deepseek-v4-flash-vision-exp`(`inputModalities: [text, image]`),无需任何第三方适配器。最小配置:
+0.1.5-rc.1+ 官方适配器(llm-deepseek)**内置视觉支持**,模型目录自带 `deepseek-flash`(DeepSeek-V41-Flash,`inputModalities: [text, image]`),无需任何第三方适配器。(2026-09-12 更新:旧名 `deepseek-v4-flash-vision-exp` 已随 V4.1-Flash 发布下线,旧版 dsh 仍可写旧名走路由兼容。)最小配置:
 
 ```yaml
 permission:
@@ -77,7 +77,7 @@ permission:
 
 agent-default-model:
   provider: deepseek-official
-  model: deepseek-v4-flash-vision-exp   # 默认模型;纯文本场景可换 deepseek-v4-flash
+  model: deepseek-flash   # 默认模型;V4.1-Flash,原生支持文本+图像,需 dsh >= 0.1.5-rc.1
 ```
 
 > 安全提示:`danger-full-access` 跳过全部权限确认,仅建议单机自用;普通模式对照:不写 `defaultPreset`(默认 `workspace-write`,每次操作询问)或 `read-only`(只读)。

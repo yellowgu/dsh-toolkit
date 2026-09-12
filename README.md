@@ -228,14 +228,14 @@ permission:
 
 agent-default-model:
   provider: deepseek-official
-  model: deepseek-v4-flash-vision-exp   # 默认模型；纯文本场景可换 deepseek-v4-flash
+  model: deepseek-flash   # 默认模型（V4.1-Flash，原生支持文本+图像；需 dsh >= 0.1.5-rc.1）
 ```
 
 要点：
 
 - provider 固定写 `deepseek-official`（新版的官方 provider id）
 - API key 走 `DEEPSEEK_API_KEY` 环境变量（适配器默认，无需在 yaml 里声明）
-- 0.1.1-rc.2+ 官方适配器（llm-deepseek）**内置视觉支持**，默认模型目录自带 `deepseek-v4-flash-vision-exp`（`inputModalities: [text, image]`），无需任何第三方适配器
+- 0.1.5-rc.1+ 官方适配器（llm-deepseek）**内置视觉支持**，模型目录自带 `deepseek-flash`（DeepSeek-V41-Flash，`inputModalities: [text, image]`），无需任何第三方适配器（2026-09-12 更新：旧名 `deepseek-v4-flash-vision-exp` 已随 V4.1-Flash 发布下线，旧版 dsh 仍可写旧名走路由兼容）
 - 修改后重启 dsh 生效
 
 ## 常用命令速查

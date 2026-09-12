@@ -6,7 +6,8 @@
 #  源码仓库：https://gitee.com/yellowgu/dsh-toolkit
 #  非官方教程；dsh 本身是 DeepSeek 官方发布的工具。
 #  每一步都会先说明再执行。脚本可重入：已完成的步骤会自动跳过。
-#  基于 dsh 0.1.1-rc.2 验证（2026-08-27）。
+#  基于 dsh 0.1.1-rc.2 验证（2026-08-27）；模型名 2026-09-12 更新为 deepseek-flash
+#  （需 dsh >= 0.1.5-rc.1；已核对 0.1.5-rc.1 适配器模型表，真机待验证）。
 # ============================================================
 
 $RepoUrl = 'https://gitee.com/yellowgu/dsh-toolkit'
@@ -145,7 +146,7 @@ permission:
 
 agent-default-model:
   provider: deepseek-official
-  model: deepseek-v4-flash-vision-exp   # 默认模型；纯文本场景可换 deepseek-v4-flash
+  model: deepseek-flash   # 默认模型（V4.1-Flash，原生支持文本+图像；需 dsh >= 0.1.5-rc.1）
 "@
 Say ''
 Say '!!! 安全警告（必读） !!!'
