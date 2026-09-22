@@ -110,7 +110,7 @@ macOS（install.sh，7 步，同构）：步骤 2 = pkg 下载 + sudo 静默安�
   [通过] dsh 已检测到：0.1.1-rc.2
   [警告] 检测到 1 个 dsh 相关进程正在运行。若稍后需要重装/升级，会先提示关闭。
 
-[步骤] 2/7 安装 Node —— 已跳过（本机已有 Node ≥ 20）
+[步骤] 2/7 安装 Node —— 已跳过（本机已有 Node ≥ 22.15）
 
 [步骤] 3/7 解除 PowerShell 执行策略拦截
   [通过] 执行策略可用：RemoteSigned
@@ -171,7 +171,10 @@ macOS（install.sh，7 步，同构）：步骤 2 = pkg 下载 + sudo 静默安�
 ### Windows
 
 ```powershell
-# 0. Node ≥ 20（无则下载安装，npmmirror CDN 直链，装完必须重开终端）
+# 0. Node ≥ 22.15（无则下载安装，npmmirror CDN 直链，装完必须重开终端）
+#    ⚠️ 不是 Node 20：dsh 会话默认用 zstd 存储，而 node:zlib 的 zstd API 要到
+#    Node 22.15 才有（v23.8.0 引入、v22.15.0 回移）。Node 20 上 dsh 装得上、
+#    也能对话，但会话不会落盘、左栏永远为空，且不报任何错。
 Invoke-WebRequest -Uri "https://cdn.npmmirror.com/binaries/node/v22.23.2/node-v22.23.2-x64.msi" -OutFile "$env:TEMP\node-v22.23.2-x64.msi"
 Start-Process msiexec.exe -ArgumentList '/i', "$env:TEMP\node-v22.23.2-x64.msi", '/qn', '/norestart' -Wait   # 需管理员
 
@@ -194,7 +197,8 @@ dsh --version   # 输出版本号（本文基于 0.1.1-rc.2）
 ### macOS
 
 ```bash
-# 0. Node ≥ 20（npmmirror CDN pkg + sudo 静默安装，装完必须重开终端）
+# 0. Node ≥ 22.15（npmmirror CDN pkg + sudo 静默安装，装完必须重开终端）
+#    ⚠️ 不是 Node 20，理由同 Windows 段（zstd 会话存储的版本门槛）
 curl -L -o "$HOME/Downloads/node-v22.23.2.pkg" "https://cdn.npmmirror.com/binaries/node/v22.23.2/node-v22.23.2.pkg"
 sudo installer -pkg "$HOME/Downloads/node-v22.23.2.pkg" -target /   # 密码输入不回显是正常的
 

@@ -14,7 +14,9 @@
 
 REPO_URL='https://gitee.com/yellowgu/dsh-toolkit'
 NODE_VER='v22.23.2'   # npmmirror CDN 固定版本（22 线最新 LTS；失效时换 v24.19.0，URL 结构相同）
-NODE_MIN=20
+NODE_MIN='22.15'      # dsh 会话默认用 zstd 存储，而 node:zlib 的 zstd API 需 Node ≥ 22.15
+NODE_MIN_MAJOR=22     # （v23.8.0 引入、v22.15.0 回移）。Node 20 全系 / 22.0-22.14 / 23.0-23.7
+NODE_MIN_MINOR=15     # 上会话持久化会静默失效：能对话但历史不落盘、左栏永远为空。
 PKG_URL="https://cdn.npmmirror.com/binaries/node/$NODE_VER/node-$NODE_VER.pkg"
 DRY_RUN="${DRY_RUN:-0}"
 
@@ -82,11 +84,19 @@ if command -v node >/dev/null 2>&1; then
   NV=$(node -v 2>/dev/null | tr -d '[:space:]') || NV=''
   NV=${NV#v}
   MAJOR=${NV%%.*}
+  MINOR=${NV#*.}; MINOR=${MINOR%%.*}
+  case "$MINOR" in ''|*[!0-9]*) MINOR=0 ;; esac
   case "$MAJOR" in
     ''|*[!0-9]*)
       warn 'node 存在但版本获取失败，视为缺失。' ;;
     *)
-      if [ "$MAJOR" -ge "$NODE_MIN" ]; then nodeOk=1; ok "Node.js 已安装：v$NV"; else warn "Node.js 版本过低：v$NV（需要 ≥ $NODE_MIN，脚本将重装）"; fi ;;
+      # 必须比对到次版本号：只比主版本号会把 Node 20 判成合格，
+      # 而 Node 20 上 dsh 的会话持久化是静默失效的（见 NODE_MIN 处注释）。
+      if [ "$MAJOR" -gt "$NODE_MIN_MAJOR" ] || { [ "$MAJOR" -eq "$NODE_MIN_MAJOR" ] && [ "$MINOR" -ge "$NODE_MIN_MINOR" ]; }; then
+        nodeOk=1; ok "Node.js 已安装：v$NV"
+      else
+        warn "Node.js 版本过低：v$NV（需要 ≥ $NODE_MIN，脚本将重装）"
+      fi ;;
   esac
 fi
 if [ "$nodeOk" = "0" ]; then tip "未检测到 Node.js ≥ $NODE_MIN，稍后步骤 2/7 将自动安装。"; fi

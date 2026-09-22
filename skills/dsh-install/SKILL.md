@@ -15,13 +15,15 @@ metadata:
 # DeepSeek dsh 安装与配置(Windows / macOS + npm 全局 + 中国网络)
 
 > 2026-08-27 实战验证(0.1.1-rc.2,Windows);macOS 按 2026-08-29 学员实战方案编写。dsh = DeepSeek Harness 的 profile 启动器:管理 web/headless 等 profile。
+> **2026-09-22 修订**:Node 前置从"≥ 20"更正为"≥ 22.15,推荐 24 LTS",并补第 5 节两条静默故障(左栏会话为空 / 工具调用 prepare 崩溃)——两条均来自粉丝现场问题排查,机制已在 0.1.1-rc.2 源码逐行核对。
 > 相关 skill:[[claude-install]](Node 前置与平台拦截问题共用其第 0、1 节)。
 
 ## 0. 前置
 
 **Windows**:
 
-- Node.js ≥ 20(见 [[claude-install]] 第 0 节;PowerShell 执行策略报错见其第 1 节)
+- **Node.js ≥ 22.15,推荐 24 LTS**。⚠️ **不是 ≥ 20**(2026-09-22 更正):dsh 会话默认用 **zstd** 存储,而 `node:zlib` 的 zstd API 是 **Node v23.8.0 引入、v22.15.0 回移**的。Node 20 全系、22.0～22.14、23.0～23.7 上,`dsh-session-persistence-jsonl` 会因找不到导出而**整个模块加载失败**,且 dsh 对此是静默降级(见第 5 节"左栏会话为空")
+- Node 安装与 PowerShell 执行策略报错见 [[claude-install]] 第 0、1 节
 - DeepSeek API key 写入用户级环境变量后**重开终端**:
 
 ```powershell
@@ -30,7 +32,8 @@ metadata:
 
 **macOS**:
 
-- Node.js ≥ 20(见 [[claude-install]] 第 0 节 macOS 部分:pkg + `sudo installer` 静默装)
+- **Node.js ≥ 22.15,推荐 24 LTS**(同 Windows,理由见上;node:zlib zstd API 的版本门槛)
+- Node 安装见 [[claude-install]] 第 0 节 macOS 部分:pkg + `sudo installer` 静默装
 - npm 全局目录修复(根治 EACCES,见 [[claude-install]] 第 1 节 macOS 部分)
 - DeepSeek API key 写入 `~/.zshrc`(幂等去重,新终端自动生效):
 
@@ -101,6 +104,17 @@ agent-default-model:
 | `dsh --help` | launcher 自身帮助 |
 
 ## 5. 故障速查
+
+**两平台通用**(2026-09-22 新增;两个都是**静默失败**,不报错的最坑):
+
+- **左栏会话列表永远为空 / 会话不落盘** → **Node 版本太老(< 22.15)**。dsh 会话默认 zstd 存储,`node:zlib` 的 zstd API 要 Node ≥ 22.15;老 Node 上 `dsh-session-persistence-jsonl` 因找不到导出而整个模块加载失败,而 `dsh-session-query` 对"持久化服务缺失"是**静默返回空列表**(`persistence === void 0 ? [] : ...`)——所以**能正常对话,但什么都不写盘**,重启即丢。
+  - 自查:`node -e "const z=require('node:zlib');console.log(typeof z.zstdCompress)"` → 打印 `undefined` 即确诊。
+  - 修法:升 Node 到 **24 LTS** 后重装 dsh;另 `dsh-session-query-sqlite` 的 `node:sqlite` 也要 22.5+/24+ 免 flag。
+- **一调用工具就报 `Cannot read properties of undefined (reading 'prepare')`**(错误码 UNKNOWN) → 进程里加载了**两份** `@deepseek-ai/dsh-tools`。`TOOL_RUNTIME_SCHEDULER` 是模块级 `Symbol`,两份副本的 Symbol 不相等,于是查不到调度器。诱因通常是 `dsh plugin add` 让 pnpm 把 `@deepseek-ai/*` 核心包复制进了 profile。
+  - 自查:`(Get-Item "$env:USERPROFILE\.dsh\profiles\node_modules\@deepseek-ai\dsh-tools").LinkType` → 空值(真目录而非 Junction)即确诊;正常应指向安装目录的软链。
+  - 修法:删 `~/.dsh/profiles/node_modules` 后重跑 `dsh web`(启动时 `healProfilesModuleFallback` 会自愈重建软链;`~/.dsh/sessions` 与 `settings.yaml` 不受影响)。若装过插件需重装插件。
+  - ⚠️ **连带后果**:崩溃前 `appendToolCall` 已先把工具调用写进会话历史 → 留下**没有配对结果的孤儿 tool_call** → 之后该会话**每条消息**都被 API 拒(`INVALID_REQUEST: tool calls need immediate results`)。**只能新开会话,重试无用。**
+  - ⚠️ 该报错**可能间歇性**:重启后加载顺序改变可能暂时恢复正常,但副本仍在、随时复发——**别当成修好了**。
 
 **Windows**:
 

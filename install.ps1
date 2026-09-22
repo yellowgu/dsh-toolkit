@@ -39,15 +39,19 @@ $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
 if ($nodeCmd) {
     try {
         $nv = (& node -v 2>$null | Out-String).Trim()
-        if ($nv -match '^v(\d+)') {
-            if ([int]$Matches[1] -ge 20) { $nodeOk = $true; Ok ('Node.js 已安装：' + $nv) }
-            else { Warn ('Node.js 版本过低：' + $nv + '（需要 ≥ 20，脚本将重装）') }
+        # 必须比对到次版本号：dsh 会话默认用 zstd 存储，而 node:zlib 的 zstd API
+        # 是 Node v23.8.0 引入、v22.15.0 回移的。Node 20 全系 / 22.0-22.14 / 23.0-23.7
+        # 上会话持久化会静默失效（能对话但历史不落盘），只比主版本号会漏判。
+        if ($nv -match '^v(\d+)\.(\d+)') {
+            $nvMajor = [int]$Matches[1]; $nvMinor = [int]$Matches[2]
+            if ($nvMajor -gt 22 -or ($nvMajor -eq 22 -and $nvMinor -ge 15)) { $nodeOk = $true; Ok ('Node.js 已安装：' + $nv) }
+            else { Warn ('Node.js 版本过低：' + $nv + '（需要 ≥ 22.15，脚本将重装）') }
         }
     } catch { Warn 'node 存在但版本获取失败，视为缺失' }
 }
 if (-not $nodeOk) {
     if (-not $isAdmin) { Die '未检测到可用的 Node.js，而安装 Node 需要管理员权限。请关闭本窗口，右键 PowerShell"以管理员身份运行"，重新执行本脚本。' }
-    Tip '未检测到 Node.js ≥ 20，稍后步骤 2/7 将自动安装。'
+    Tip '未检测到 Node.js ≥ 22.15，稍后步骤 2/7 将自动安装。'
 }
 
 $hasDsh = $null -ne (Get-Command dsh -ErrorAction SilentlyContinue)
@@ -74,7 +78,7 @@ if (-not $nodeOk) {
         exit 0
     } catch { Die 'Node 下载或安装失败。请检查网络后重跑；或改 v24.19.0 直链手动下载。' }
 } else {
-    Step '2/7 安装 Node —— 已跳过（本机已有 Node ≥ 20）'
+    Step '2/7 安装 Node —— 已跳过（本机已有 Node ≥ 22.15）'
 }
 
 # ---------- 3/7 解除执行策略 ----------
